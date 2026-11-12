@@ -1,4 +1,4 @@
-import type { Scenario, Severity } from './types'
+import type { Severity } from './types'
 
 export const severityOrder: Severity[] = ['Critical', 'High', 'Medium', 'Low']
 
@@ -8,60 +8,3 @@ export const severityColors: Record<Severity, string> = {
   Medium: '#e4bc62',
   Low: '#4da7a0',
 }
-
-export const sampleScenarios: Scenario[] = [
-  {
-    id: 'musi-flood',
-    name: 'Musi River Flooding',
-    region: 'Hyderabad, Telangana',
-    description: 'A simulated flood response along the Musi corridor.',
-    sample: true,
-    areas: [
-      { id: 'mf-a1', name: 'Afzal Gunj', location: { lat: 17.3707, lng: 78.4794 }, population: 12500, severity: 'Critical', demand: 8 },
-      { id: 'mf-a2', name: 'Chaderghat', location: { lat: 17.3789, lng: 78.4945 }, population: 9400, severity: 'High', demand: 7 },
-      { id: 'mf-a3', name: 'Amberpet', location: { lat: 17.3945, lng: 78.5166 }, population: 8100, severity: 'Medium', demand: 5 },
-      { id: 'mf-a4', name: 'Attapur', location: { lat: 17.3665, lng: 78.4297 }, population: 6200, severity: 'Low', demand: 6 },
-    ],
-    bases: [
-      { id: 'mf-b1', name: 'Central Response Base', location: { lat: 17.3948, lng: 78.4771 }, quantity: 9 },
-      { id: 'mf-b2', name: 'Eastern Medical Base', location: { lat: 17.4078, lng: 78.5194 }, quantity: 8 },
-      { id: 'mf-b3', name: 'Western Rescue Base', location: { lat: 17.385, lng: 78.4392 }, quantity: 7 },
-    ],
-  },
-  {
-    id: 'coastal-cyclone',
-    name: 'Coastal Cyclone',
-    region: 'Visakhapatnam, Andhra Pradesh',
-    description: 'A simulated coastal response after severe winds and flooding.',
-    sample: true,
-    areas: [
-      { id: 'cc-a1', name: 'Gajuwaka', location: { lat: 17.683, lng: 83.209 }, population: 14700, severity: 'Critical', demand: 9 },
-      { id: 'cc-a2', name: 'MVP Colony', location: { lat: 17.739, lng: 83.333 }, population: 10800, severity: 'High', demand: 6 },
-      { id: 'cc-a3', name: 'Old Town', location: { lat: 17.696, lng: 83.301 }, population: 7900, severity: 'High', demand: 5 },
-      { id: 'cc-a4', name: 'Madhurawada', location: { lat: 17.827, lng: 83.352 }, population: 5600, severity: 'Medium', demand: 4 },
-    ],
-    bases: [
-      { id: 'cc-b1', name: 'Port Response Base', location: { lat: 17.7, lng: 83.291 }, quantity: 8 },
-      { id: 'cc-b2', name: 'North Medical Base', location: { lat: 17.772, lng: 83.339 }, quantity: 7 },
-      { id: 'cc-b3', name: 'South Rescue Base', location: { lat: 17.667, lng: 83.235 }, quantity: 7 },
-    ],
-  },
-  {
-    id: 'urban-earthquake',
-    name: 'Urban Earthquake',
-    region: 'New Delhi, Delhi',
-    description: 'A simulated urban rescue response across central Delhi.',
-    sample: true,
-    areas: [
-      { id: 'ue-a1', name: 'Karol Bagh', location: { lat: 28.6519, lng: 77.19 }, population: 13100, severity: 'Critical', demand: 8 },
-      { id: 'ue-a2', name: 'Paharganj', location: { lat: 28.6419, lng: 77.2145 }, population: 8800, severity: 'High', demand: 6 },
-      { id: 'ue-a3', name: 'Daryaganj', location: { lat: 28.6461, lng: 77.2423 }, population: 7100, severity: 'Medium', demand: 5 },
-      { id: 'ue-a4', name: 'Lajpat Nagar', location: { lat: 28.5708, lng: 77.244 }, population: 9900, severity: 'High', demand: 7 },
-    ],
-    bases: [
-      { id: 'ue-b1', name: 'Central Medical Base', location: { lat: 28.6289, lng: 77.2065 }, quantity: 10 },
-      { id: 'ue-b2', name: 'East Response Base', location: { lat: 28.625, lng: 77.252 }, quantity: 7 },
-      { id: 'ue-b3', name: 'South Rescue Base', location: { lat: 28.583, lng: 77.228 }, quantity: 7 },
-    ],
-  },
-]

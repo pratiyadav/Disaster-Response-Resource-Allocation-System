@@ -30,12 +30,15 @@ export interface Scenario {
   areas: Area[]
   bases: ResourceBase[]
   sample: boolean
+  revision: number
 }
 
 export interface Assignment {
   baseId: string
   areaId: string
   quantity: number
+  travelMinutes: number
+  isFallback: boolean
 }
 
 export interface Metrics {
@@ -55,5 +58,23 @@ export interface AllocationRun {
   metrics: Metrics
   runtimeMs: number
   createdAt: string
-  illustrative: boolean
+  revision: number
+  usesFallback: boolean
+}
+
+export type RunSummary = Pick<AllocationRun, 'id' | 'method' | 'revision' | 'createdAt' | 'runtimeMs'>
+
+export interface SavedRun extends AllocationRun {
+  scenario: Scenario
+}
+
+export interface TravelMatrixData {
+  revision: number
+  pairs: {
+    baseId: string
+    areaId: string
+    seconds: number
+    distanceMeters: number
+    isFallback: boolean
+  }[]
 }

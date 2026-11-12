@@ -1,7 +1,49 @@
 services:
+  database:
+    image: postgis/postgis:16-3.7
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: drras
+      POSTGRES_USER: drras
+      POSTGRES_PASSWORD: drras-local
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U drras -d drras"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql://drras:drras-local@database:5432/drras
+      OSRM_URL: ${OSRM_URL-https://router.project-osrm.org}
+      FALLBACK_SPEED_KMH: ${FALLBACK_SPEED_KMH:-30}
+      UNMET_PENALTY_SECONDS: ${UNMET_PENALTY_SECONDS:-7200}
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   frontend:
     build:
       context: ./frontend
     ports:
-      - "8080:80"
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  database-data:

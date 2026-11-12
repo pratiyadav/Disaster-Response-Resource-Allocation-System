@@ -2,9 +2,9 @@
 
 ## Current state
 
-This folder now contains the requirements PDFs in `Document/` and a React/TypeScript frontend in `frontend/`. The frontend is an interactive, browser-local prototype with clearly labeled illustrative allocation previews and synthetic travel times. `compose.yaml` and `frontend/Dockerfile` serve that frontend. There is still no FastAPI service, OSRM integration, PostgreSQL schema, OR-Tools solver, or deployed operational system. Treat the backend architecture below as the **intended design**, not an implemented system. Do not describe demo previews as verified optimization results.
+DRRAS has a React/Leaflet dashboard, a FastAPI backend, a PostgreSQL/PostGIS database, OSRM matrix routing with a flagged straight-line fallback, a severity-first baseline, and an OR-Tools optimizer. The dashboard compares saved runs on the same scenario revision. Docker Compose runs the three services locally.
 
-Implementation explanations live in `docs/`. Start at `docs/README.md`, then update the relevant guide and `docs/changes.md` whenever a meaningful part changes. Keep `Document/` for the original requirements and keep `AGENT.MD` focused on product intent, architecture, and working constraints.
+Start at [docs/README.md](docs/README.md) for the implementation and [docs/backend.md](docs/backend.md) for the full backend and database walkthrough. The PDFs in `Document/` remain the original coursework requirements. Update the relevant guide and `docs/changes.md` when a meaningful part changes.
 
 ## Purpose
 
@@ -29,7 +29,7 @@ If documents disagree, use the SRS as the implementation baseline, record the di
 
 **Out of scope:** machine learning, live emergency-service integration, real-time vehicle tracking, mobile app, accounts or authentication, multiple simultaneous resource types, live traffic or weather, blocked roads, and multi-stage deployment.
 
-## Intended architecture and data flow
+## Architecture and data flow
 
 ```text
 Coordinator -> React dashboard + Leaflet map -> FastAPI REST API
@@ -66,11 +66,11 @@ Core domain concepts in the CRC cards are Scenario, Area, ResourceBase, Resource
 
 Validate coordinates, nonnegative population/demand/stock/assignments, allowed severity, base capacity, and area demand. Use parameterized database access and keep database credentials outside source and frontend assets.
 
-## Planned technology stack
+## Technology stack
 
-The SRS specifies the core stack; the selections below make its remaining options concrete for implementation. The frontend uses React, TypeScript, Vite, Leaflet, and Docker/Nginx. The backend choices remain planned.
+The SRS defines the core stack. The project uses React, TypeScript, Vite, Leaflet, Python/FastAPI, PostgreSQL/PostGIS, OSRM, and OR-Tools. Docker Compose runs the database, API, and Nginx frontend.
 
-| Layer | Planned choice | Why it fits |
+| Layer | Implementation | Why it fits |
 | --- | --- | --- |
 | Frontend | React with TypeScript and Leaflet | Browser dashboard, forms, severity map, result and comparison views. TypeScript is an implementation choice; the SRS names React and Leaflet. |
 | API and application services | Python with FastAPI | REST/JSON boundary for scenario, travel-time, allocation, and comparison processes. |
@@ -79,16 +79,15 @@ The SRS specifies the core stack; the selections below make its remaining option
 | Routing and map data | OSRM over OpenStreetMap; Leaflet with OpenStreetMap tiles | Road travel times from an external routing service and browser map display. |
 | Routing fallback | Straight-line geodesic distance with a documented time estimate | Keeps a run possible when OSRM fails; the conversion assumption and accuracy must be disclosed. |
 
-### Frontend prototype files
+### Source layout
 
-- `frontend/src/App.tsx`: dashboard views, scenario forms, preview controls, comparison, and browser-local scenario state.
-- `frontend/src/ScenarioMap.tsx`: Leaflet map, area and base markers, preview routes, and tile-failure notice.
-- `frontend/src/data.ts`: three explicitly simulated sample scenarios.
-- `frontend/src/demo.ts`: browser-only synthetic travel estimates and illustrative assignment previews. It is **not** an OSRM integration or OR-Tools optimizer and must be replaced or bypassed when the backend API is connected.
-- `frontend/src/types.ts`: frontend domain contracts.
-- `frontend/Dockerfile`, `frontend/nginx.conf`, `compose.yaml`: static frontend container setup; no backend container exists yet.
-
-Keep the scenario API, routing/matrix service, baseline allocator, optimizer, common metrics calculator, and comparison service as separate modules. Keep the optimization weights configurable, not hard-coded in the algorithm. Avoid adding deployment tools or other dependencies until implementation requirements call for them.
+- `frontend/src/App.tsx` owns the dashboard views and `frontend/src/api.ts` calls the API.
+- `frontend/src/ScenarioMap.tsx` owns Leaflet map rendering.
+- `backend/app/main.py` defines API endpoints and coordinates database transactions.
+- `backend/app/repository.py` contains parameterized database queries and migration logic.
+- `backend/app/routing.py` builds a matrix and records fallback provenance.
+- `backend/app/allocation.py` implements both methods and their shared metrics.
+- `backend/migrations/` defines and evolves the PostgreSQL schema.
 
 ## Evaluation and implementation order
 
@@ -98,11 +97,11 @@ Keep the scenario API, routing/matrix service, baseline allocator, optimizer, co
 
 For both methods, report average and maximum response time, coverage ratio, unmet demand, resource utilization, and total travel cost. Show computation or solver runtime alongside allocation quality. Verify at least capacity/demand constraints, matrix completeness, independent runs, persistent result retrieval, and comparison on identical inputs.
 
-## Clarifications and document conflicts to resolve before implementation
+## Document conflicts and implementation decisions
 
 - The `Data Flow Diagram.pdf` Level 2 **Optimized** figure repeats the baseline chain and labels. Use SRS process 5.1-5.5 (build model, solve, validate, calculate metrics, store) as the intended optimizer flow.
 - The use-case report includes `DR-007 Test Scenarios`, while the SRS calls sample-scenario runs project testing rather than a user-facing use case. Build sample data and evaluation; do not add a separate product feature solely from DR-007.
 - A CRC card says a resource base reduces stock when resources are sent, but the SRS requires independent baseline and optimized runs on identical stock. Treat runs as plans against unchanged scenario stock unless a future operational deployment feature is explicitly specified.
-- The SRS narrative suggests the optimizer can favor more severe areas, but its stated objective contains only travel cost and **unweighted** unmet demand. Decide and document whether unmet demand is severity-weighted before claiming severity-aware optimization; apply the chosen metric and comparison definitions consistently.
-- Define metric formulas precisely before evaluation: whether average time is weighted by dispatched units, how maximum time treats unserved areas, and how fallback travel time is estimated from straight-line distance.
-- Decide how changes to scenario coordinates, demand, or stock invalidate or version the stored travel matrix and prior runs. A comparison is valid only when both runs use the same scenario data and matrix revision.
+- The SRS narrative suggests the optimizer can favor more severe areas, but its stated objective contains only travel cost and **unweighted** unmet demand. The optimizer uses the unweighted SRS objective, with a configurable penalty per unmet unit. The baseline gives priority to severity.
+- Average response time is weighted by assigned units. Maximum response time considers the used pairs. The fallback divides the great-circle distance by a configurable speed. The walkthrough documents the formulas.
+- Changes to inputs create a new scenario revision. Current comparison uses runs for that revision, and historical matrices, runs, and input snapshots remain readable through the API.

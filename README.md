@@ -1,49 +1,31 @@
-# DRRAS frontend
+# Disaster Response Resource Allocation System
 
-This repository contains the design documents for the Disaster Response Resource Allocation System and a React frontend prototype. The dashboard lets a coordinator inspect simulated scenarios on a map, add areas and resource bases, preview two allocation plans, and compare their metrics.
+DRRAS is a decision-support prototype for a coordinator planning ambulance allocations in simulated disasters. The dashboard maps affected areas and resource bases, runs a severity-first baseline and a constrained optimizer, and compares their saved results. The coordinator reviews the proposed assignments.
 
-For how each implemented part works, start with the [implementation documentation](docs/README.md). The original requirements PDFs are in `Document/`.
+## Start the application
 
-**Current boundary:** the frontend is a demo. Scenario edits are stored in this browser's `localStorage`. Travel times use a synthetic straight-line estimate, and the alternative preview is not an OR-Tools solution. No FastAPI backend, PostgreSQL database, OSRM routing call, or operational dispatch connection is included. The UI labels these limits.
-
-## Run locally
-
-Requirements: Node.js 22 or newer and npm.
+Install Docker with Compose, then run from the repository root:
 
 ```sh
-cd frontend
-npm ci
-npm run dev
+docker compose up --build --wait -d
 ```
 
-Open the local URL printed by Vite. OpenStreetMap tiles require an internet connection; area and base lists remain available if tiles fail.
+- Dashboard at <http://localhost:8080>
+- Interactive API documentation at <http://localhost:8080/api/docs>
+- Database readiness at <http://localhost:8080/api/health>
 
-## Run with Docker
+Select one of the three simulated scenarios. Run **Baseline** and **Optimized**, then open **Compare results**. The matrix is created on the first run. The dashboard flags straight-line estimates when road data is unavailable. OpenStreetMap tiles require internet access.
 
-Requirements: Docker with the Compose plugin.
+Open **Travel matrix** to inspect routing estimates, **Allocations** to see unmet ambulance demand by area, and **Run history** to revisit plans from earlier scenario revisions.
 
-```sh
-docker compose up --build -d
-```
+Stop the stack with `docker compose down`. The named database volume keeps scenarios and results across restarts.
 
-Open <http://localhost:8080>. The production build is served by Nginx, including SPA route fallback and a `/healthz` endpoint. Stop it with `docker compose down`.
+## Project guide
 
-The Compose file runs the frontend only. A backend service and PostGIS container should be added when their implementation and API contract exist.
+- [Backend and database walkthrough](docs/backend.md) explains the workflow, schema, API, solver, and how to modify the implementation.
+- [Frontend behavior](docs/frontend.md) describes the dashboard and its API integration.
+- [Docker and local development](docs/docker.md) covers ports, settings, startup, and logs.
+- [Change log](docs/changes.md) records the implementation and its verification.
+- [Original requirements](Document/DRRAS_SRS.pdf) describe the intended coursework scope.
 
-## Build check
-
-```sh
-cd frontend
-npm run build
-```
-
-## Project layout
-
-- `Document/`: requirements, feasibility, use cases, data flow, analysis classes, and user stories.
-- `docs/`: implementation architecture, frontend behavior, Docker setup, and change log. Update these guides as the project grows.
-- `AGENT.MD`: project intent, planned architecture, constraints, and unresolved document conflicts.
-- `frontend/src/App.tsx`: dashboard views, scenario forms, preview controls, and comparison.
-- `frontend/src/ScenarioMap.tsx`: interactive Leaflet map.
-- `frontend/src/data.ts`: simulated sample scenarios.
-- `frontend/src/demo.ts`: illustrative browser-only assignment previews and metrics.
-- `compose.yaml` and `frontend/Dockerfile`: frontend container setup.
+Run `npm ci` and `npm run build` in `frontend/` to check the frontend. To work with hot reload while using the Compose backend, follow the [local development steps](docs/docker.md#frontend-hot-reload).

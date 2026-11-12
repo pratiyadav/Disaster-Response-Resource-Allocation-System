@@ -1,0 +1,6 @@
+fastapi>=0.121,<1
+httpx>=0.28,<1
+ortools>=9.12,<10
+psycopg[binary,pool]>=3.2,<4
+pydantic>=2.7,<3
+uvicorn>=0.34,<1

@@ -179,6 +179,17 @@ h1, h2, h3, p { margin-top: 0; }
 .run-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; margin-bottom: 18px; }
 .allocation-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(290px, .85fr); gap: 18px; margin-bottom: 18px; }
 .allocation-grid .panel:first-child { min-height: 430px; }
+.detail-stack { display: grid; gap: 18px; min-width: 0; }
+.detail-stack .allocation-grid { margin-bottom: 0; }
+.dashboard-status { margin: 0; color: #54707c; font-size: 12px; line-height: 1.5; }
+.dashboard-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 16px; color: #54707c; font-size: 11px; }
+.history-row--selected { background: #edf8f5; }
+.matrix-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 19px; }
+.matrix-totals > div { padding: 13px; border-radius: 8px; background: #f1f7f7; }
+.matrix-totals strong { display: block; font-size: 21px; color: #173a4c; margin-bottom: 4px; }
+.matrix-totals span { display: block; font-size: 11px; color: #54707c; line-height: 1.4; }
+.matrix-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 195px)); margin-bottom: 10px; }
+.delta--fallback { background: #fff4df; color: #805822; }
 .metric-list { margin-top: 6px; }
 .metric-line { min-height: 42px; border-bottom: 1px solid #edf2f3; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; }
 .metric-line span { color: #8095a0; }
